@@ -9,8 +9,13 @@ profile: default
 
 models:
   my_new_project:
-    # mart:
-    #  +materialized: table
-
+      staging:
+        +materialized: view
+      intermediate:
+        +materialized: view
+      mart:
+        +materialized: table
+        finance:
+          +schema: finance
 
 
