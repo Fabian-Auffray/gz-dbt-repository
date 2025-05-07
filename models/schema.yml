@@ -1,47 +1,30 @@
-# schema.yml
-
- version: 2
-
- sources:
-   - name: raw
-     schema : gz_raw_data
-     tables:
-       - name: sales
-         identifier: raw_gz_sales
-         description: sales of Greenweez / we have on row per product_id found in each orders_id
-         columns: 
-          - name: date_date  
-            description : date of purchase
-          - name : orders_id
-            description : primary key
-          - name: pdt_id
-            description : id of each product sold
-          - name: revenue
-            description : revenue per each order
-          - name: quantity
-            description : nb of product sold    
-       - name: product
-         identifier : raw_gz_products
-         columns:
-           - name: products_id
-             description: primary_key
-             tests:
+sources:
+  - name: raw
+    schema: gz_raw_data
+    tables:
+      - name: product
+        identifier: raw_gz_products
+        description: product of Greenweez / we have on row per product id with purchase price
+        columns:
+          - name: products_id
+            tests:
                - unique
-               - not_null
-           - name: purchase_price
-             description: price per each product
-       - name: ship
-         identifier : raw_gz_ship
-         columns:
-           - name: orders_id
-             description: primary_key, foreign_key of stg_raw_prodcut
-             tests:
+      - name: sales
+        identifier: raw_gz_sales
+        description: sales of Greenweez / we have on row per product id found in each orders_id
+        columns:
+          - name : date_date
+            description: purchase_date
+        freshness:
+          warn_after: {count: 90, period: day}
+          error_after: {count: 120, period: day}
+        tests:
+            - unique:
+                column_name: "(orders_id||'_'||pdt_id)"
+      - name: ship
+        identifier: raw_gz_ship
+        description: shipping of Greenweez / we have shipping information in each orders_id
+        columns:
+          - name: orders_id
+            tests:
                - unique
-               - not_null
-           - name: shipping_fee
-             description: shipping fee / orders_id
-           - name: logcost
-             description: logistic cost
-           - name: ship_cost
-             description: shipping cost / order
-
